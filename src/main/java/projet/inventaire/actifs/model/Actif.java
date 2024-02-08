@@ -1,4 +1,6 @@
 package projet.inventaire.actifs.model;
+import javax.persistence.*;
+
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,7 +9,7 @@ import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
-public class Article {
+public class Actif {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
