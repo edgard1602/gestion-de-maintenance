@@ -16,7 +16,7 @@ import java.util.List;
 public class ActifsController {
 
     @Autowired
-    private ActifService articleService;
+    private ActifService actifService;
 
     @PostMapping
     public ResponseEntity<Actif> createArticle(@RequestBody Actif actif) {
@@ -26,7 +26,7 @@ public class ActifsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Actif> getActifById(@PathVariable Long id) {
-        Actif actif = actifService.getActif(id);
+        Actif actif = actifService.getActifById(id);
         if (actif != null) {
             return new ResponseEntity<>(actif, HttpStatus.OK);
         } else {
