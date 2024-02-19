@@ -1,9 +1,15 @@
 package projet.inventaire.actifs.model;
 
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.management.relation.Role;
 import java.util.Collection;
+import java.util.Set;
 
 public class User implements UserDetails {
 
@@ -21,6 +27,11 @@ public class User implements UserDetails {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<String> roles;
+
 
     // Getters and setters for username
     public String getUsername() {
@@ -75,6 +86,14 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 }
 
