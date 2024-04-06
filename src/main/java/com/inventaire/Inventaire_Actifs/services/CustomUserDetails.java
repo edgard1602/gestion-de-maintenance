@@ -1,11 +1,11 @@
 package com.inventaire.Inventaire_Actifs.services;
 
+import com.inventaire.Inventaire_Actifs.model.Role;
 import com.inventaire.Inventaire_Actifs.model.User;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.inventaire.Inventaire_Actifs.model.Role;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,9 +22,9 @@ public class CustomUserDetails extends User implements UserDetails {
         this.password= byUsername.getPassword();
         List<GrantedAuthority> auths = new ArrayList<>();
 
-        for(Role role : byUsername.getRoles()){
-
-            auths.add(new SimpleGrantedAuthority(role.getName().toUpperCase()));
+        Role role = byUsername.getRole();
+        if (role != null) {
+            auths.add(new SimpleGrantedAuthority(role.toString()));
         }
         this.authorities = auths;
     }

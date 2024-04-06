@@ -9,9 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 
@@ -73,5 +71,13 @@ public class JwtService {
     private Key getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+
+    // Liste noire pour stocker les tokens invalidés
+    private Set<String> invalidatedTokens = new HashSet<>();
+    // Méthode pour invalider un token
+    public void invalidateToken(String token) {
+        invalidatedTokens.add(token);
     }
 }

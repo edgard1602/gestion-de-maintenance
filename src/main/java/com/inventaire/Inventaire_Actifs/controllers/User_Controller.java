@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/users")
 public class User_Controller {
@@ -31,22 +32,40 @@ public class User_Controller {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody User user) {
-        userService.createUser(user);
-        return new ResponseEntity<>("User signed up successfully!", HttpStatus.CREATED);
+    public ResponseEntity<User> signUp(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
+
+
+//    @PostMapping("/use")
+//    public ResponseEntity<String> createUser(@RequestBody User user) {
+//        userService.createUser(user);
+//        return new ResponseEntity<>("User created successfully!", HttpStatus.CREATED);
+//    }
+
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User user) {
-        userService.updateUser(id, user);
-        return new ResponseEntity<>("User updated successfully!", HttpStatus.OK);
+    public ResponseEntity<Void> updateUser(@PathVariable Long id, @RequestBody User user) {
+        User updatedUser = userService.updateUser(id, user);
+        if (updatedUser != null) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        boolean deleted = userService.deleteUser(id);
+        if (deleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
 
 
 }

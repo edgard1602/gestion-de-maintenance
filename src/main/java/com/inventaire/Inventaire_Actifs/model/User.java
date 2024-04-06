@@ -1,21 +1,11 @@
 package com.inventaire.Inventaire_Actifs.model;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Set;
 import com.inventaire.Inventaire_Actifs.model.Role;
 
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-
 import jakarta.persistence.*;
-import java.util.Set;
 
 @Entity
 public class User {
@@ -30,10 +20,8 @@ public class User {
 
     @Transient
     private String confirmPassword;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles = new HashSet<>();
-
+    @Enumerated(value = EnumType.STRING)
+    Role role;
 
 
     // Getters and setters
@@ -69,15 +57,6 @@ public class User {
         this.confirmPassword = confirmPassword;
     }
 
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
     public void setEmail(String email) {
         this.email = email;
     }
@@ -85,6 +64,12 @@ public class User {
         return email;
     }
 
+    public Role getRole() {
+        return role;
+    }
 
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }
 

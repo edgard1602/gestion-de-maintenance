@@ -18,7 +18,18 @@ public class Actif {
     private boolean estNeuf;
     private String personneReception;
 
+    @ManyToOne
+    private Agence agence;
+
     // Constructeurs, getters et setters
+
+    public Agence getAgence() {
+        return agence;
+    }
+
+    public void setAgence(Agence agence) {
+        this.agence = agence;
+    }
 
     public Long getId() {
         return id;

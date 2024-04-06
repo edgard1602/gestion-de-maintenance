@@ -36,6 +36,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             username = jwtService.extractUsername(token);
         }
 
+        // Check if the request is for /login
+        if (request.getRequestURI().equals("/api/login")) {
+            // Allow access to /login without JWT token
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
             if(jwtService.validateToken(token, userDetails)){
@@ -49,3 +56,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

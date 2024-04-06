@@ -1,13 +1,18 @@
 package com.inventaire.Inventaire_Actifs.controllers;
 
 import com.inventaire.Inventaire_Actifs.model.Actif;
+import com.inventaire.Inventaire_Actifs.model.Agence;
 import com.inventaire.Inventaire_Actifs.services.Actif_Service;
+import com.inventaire.Inventaire_Actifs.services.AgenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/actif")
 public class Actif_controller {
@@ -15,10 +20,40 @@ public class Actif_controller {
     @Autowired
     private Actif_Service actifService;
 
+    @Autowired
+    private AgenceService agenceService;
+
+
+//    @PostMapping
+//    public ResponseEntity<Actif> createActif(@RequestBody Actif actif, @RequestParam("agenceId") Long agenceId) {
+//        // Récupérer l'agence correspondante à partir de son ID
+//        Optional<Agence> agence = agenceService.getAgenceById(agenceId);
+//
+//        // Vérifier si l'agence existe
+//        if (agence == null) {
+//            return new ResponseEntity<>("Agence non trouvée", HttpStatus.NOT_FOUND);
+//        }
+//
+//        // Associer l'actif à l'agence récupérée
+//        actif.setAgence(agence);
+//
+//        // Créer l'actif avec l'agence associée
+//        Actif createdActif = actifService.createActif(actif);
+//
+//        // Vérifier si la création a réussi
+//        if (createdActif != null) {
+//            return new ResponseEntity<>(createdActif, HttpStatus.CREATED);
+//        }
+//    }
+
     @PostMapping
-    public ResponseEntity<Actif> createArticle(@RequestBody Actif actif) {
-        Actif createdActif = actifService.createActif(actif);
-        return new ResponseEntity<>(createdActif, HttpStatus.CREATED);
+    public ResponseEntity<Actif> createActifWithAgence(@RequestBody Actif actif, @RequestParam("agenceId") Long agenceId) {
+        Actif createdActif = actifService.createActifWithAgence(actif, agenceId);
+        if (createdActif != null) {
+            return new ResponseEntity<>(createdActif, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
@@ -52,6 +87,16 @@ public class Actif_controller {
         boolean deleted = actifService.deleteActif(id);
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{actifId}/associerAgence/{agenceId}")
+    public ResponseEntity<Actif> associerActifAAgence(@PathVariable Long actifId, @PathVariable Long agenceId) {
+        Actif actif = actifService.associerActifAAgence(actifId, agenceId);
+        if (actif != null) {
+            return new ResponseEntity<>(actif, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
