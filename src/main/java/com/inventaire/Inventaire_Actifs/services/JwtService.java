@@ -1,83 +1,82 @@
 package com.inventaire.Inventaire_Actifs.services;
 
+import com.inventaire.Inventaire_Actifs.model.User;
+import com.inventaire.Inventaire_Actifs.repositories.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.security.Key;
-import java.util.*;
+import javax.crypto.SecretKey;
+import java.util.Date;
 import java.util.function.Function;
 
-
-@Component
+@Service
 public class JwtService {
 
-    public static final String SECRET = "357638792F423F4428472B4B6250655368566D597133743677397A2443264629";
+    private final String SECRET_KEY = "4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c";
+    private final TokenRepository tokenRepository;
+
+    public JwtService(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public Date extractExpiration(String token) {
+
+    public boolean isValid(String token, UserDetails user) {
+        String username = extractUsername(token);
+
+        boolean validToken = tokenRepository
+                .findByToken(token)
+                .map(t -> !t.isLoggedOut())
+                .orElse(false);
+
+        return (username.equals(user.getUsername())) && !isTokenExpired(token) && validToken;
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    public <T> T extractClaim(String token, Function<Claims, T> resolver) {
+        Claims claims = extractAllClaims(token);
+        return resolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token) {
         return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignKey())
+                .parser()
+                .verifyWith(getSigninKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 
+    public String generateToken(User user) {
+        String token = Jwts
+                .builder()
+                .subject(user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 24*60*60*1000 ))
+                .signWith(getSigninKey())
+                .compact();
 
-    public String GenerateToken(String username){
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return token;
     }
 
-
-
-    private String createToken(Map<String, Object> claims, String username) {
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+1000*60*1))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
-    }
-
-    private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+    private SecretKey getSigninKey() {
+        byte[] keyBytes = Decoders.BASE64URL.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-
-    // Liste noire pour stocker les tokens invalidés
-    private Set<String> invalidatedTokens = new HashSet<>();
-    // Méthode pour invalider un token
-    public void invalidateToken(String token) {
-        invalidatedTokens.add(token);
-    }
 }
