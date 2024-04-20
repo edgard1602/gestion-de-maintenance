@@ -2,6 +2,7 @@ package com.inventaire.Inventaire_Actifs.model;
 
 import jakarta.persistence.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -68,7 +69,14 @@ public class Actif {
     }
 
     public void setDateArrivee(Date dateArrivee) {
-        this.dateArrivee = dateArrivee;
+        // Formater la date au format "yyyy-MM-dd" avant de l'assigner à l'attribut
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = sdf.format(dateArrivee);
+        try {
+            this.dateArrivee = sdf.parse(formattedDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isEstNeuf() {

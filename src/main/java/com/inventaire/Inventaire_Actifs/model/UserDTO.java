@@ -7,6 +7,7 @@ public class UserDTO {
     private String username;
     private String email;
     private Role role;
+    private String password;
 
     // Constructeur
 
@@ -56,6 +57,14 @@ public class UserDTO {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
 

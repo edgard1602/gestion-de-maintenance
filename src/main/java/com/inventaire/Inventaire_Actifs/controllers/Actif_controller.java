@@ -7,6 +7,7 @@ import com.inventaire.Inventaire_Actifs.services.AgenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,27 +25,7 @@ public class Actif_controller {
     private AgenceService agenceService;
 
 
-//    @PostMapping
-//    public ResponseEntity<Actif> createActif(@RequestBody Actif actif, @RequestParam("agenceId") Long agenceId) {
-//        // Récupérer l'agence correspondante à partir de son ID
-//        Optional<Agence> agence = agenceService.getAgenceById(agenceId);
-//
-//        // Vérifier si l'agence existe
-//        if (agence == null) {
-//            return new ResponseEntity<>("Agence non trouvée", HttpStatus.NOT_FOUND);
-//        }
-//
-//        // Associer l'actif à l'agence récupérée
-//        actif.setAgence(agence);
-//
-//        // Créer l'actif avec l'agence associée
-//        Actif createdActif = actifService.createActif(actif);
-//
-//        // Vérifier si la création a réussi
-//        if (createdActif != null) {
-//            return new ResponseEntity<>(createdActif, HttpStatus.CREATED);
-//        }
-//    }
+
 
     @PostMapping
     public ResponseEntity<Actif> createActifWithAgence(@RequestBody Actif actif, @RequestParam("agenceId") Long agenceId) {
@@ -83,6 +64,7 @@ public class Actif_controller {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteActif(@PathVariable Long id) {
         boolean deleted = actifService.deleteActif(id);
         if (deleted) {

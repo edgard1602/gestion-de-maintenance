@@ -5,7 +5,7 @@ import com.inventaire.Inventaire_Actifs.model.User;
 
 import java.util.Optional;
 
-public interface User_Repository extends JpaRepository<User, Long> {
+public interface User_Repository extends JpaRepository<User, Integer> {
 
     Optional<User> findByUsername(String username);
 }
